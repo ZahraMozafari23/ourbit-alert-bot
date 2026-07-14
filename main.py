@@ -4,7 +4,7 @@ import requests
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
-DROP_PERCENT = -50
+DROP_PERCENT = -5
 
 alerted_coins = set()
 
@@ -68,7 +68,7 @@ def check_coins():
 
             print(symbol, change)
 
-            if change >= 1:
+            if change <=DROP_PERCENT:
 
                 if symbol in alerted_coins:
                     continue
