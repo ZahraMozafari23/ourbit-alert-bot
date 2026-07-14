@@ -68,7 +68,7 @@ def check_coins():
 
             print(symbol, change)
 
-            if change <= DROP_PERCENT:
+            if change >= 1:
 
                 if symbol in alerted_coins:
                     continue
