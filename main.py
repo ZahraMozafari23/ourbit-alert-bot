@@ -73,7 +73,7 @@ def check_coins():
 
             symbol = coin["sb"]
             price = float(coin["c"])
-            new_prices[symol] = price
+            new_prices[symbol] = price
 
             if symbol.startswith("~~"):
                 continue
@@ -99,7 +99,7 @@ def check_coins():
 
         except Exception as e:
             print("Coin Error:", e)
-            save_prices(new_prices)
+save_prices(new_prices)  
 
 
 print("Bot Started")
