@@ -95,6 +95,7 @@ def check_coins():
     coins = data["data"]
 
     print("Coins:", len(coins))
+    send_message("تست ربات")
 
     for coin in coins:
 
@@ -168,5 +169,6 @@ def check_coins():
 print("Bot Started")
 
 check_coins()
+
 
 print("Finished")
