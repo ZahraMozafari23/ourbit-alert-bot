@@ -7,7 +7,7 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
 # درصد ریزش موردنظر
-DROP_PERCENT = 100
+DROP_PERCENT = 1
 
 # هر 5 دقیقه اجرا می‌شود
 CHECK_INTERVAL = 300
@@ -95,7 +95,7 @@ def check_coins():
     coins = data["data"]
 
     print("Coins:", len(coins))
-    send_message("تست ربات")
+   
 
     for coin in coins:
 
@@ -134,7 +134,7 @@ def check_coins():
 
                     print(symbol, f"{change:.2f}%")
 
-                    if True:
+                    if change <= DROP_PERCENT
 
                         if symbol not in alerted_coins:
 
