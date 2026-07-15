@@ -3,7 +3,7 @@ import requests
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
-
+CHAT_ID2 = os.getenv("CHAT_ID2")
 DROP_PERCENT = -50
 
 alerted_coins = set()
@@ -13,7 +13,7 @@ def send_message(text):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
     data = {
-        "chat_id": CHAT_ID,
+        "chat_id": CHAT_ID,CHAT_ID2
         "text": text
     }
 
