@@ -4,7 +4,8 @@ on:
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
-
+  permissions:
+  contents: write
 jobs:
   run-bot:
     runs-on: ubuntu-latest
@@ -26,3 +27,11 @@ jobs:
           CHAT_ID: ${{ secrets.CHAT_ID }}
           CHAT_ID2: ${{ secrets.CHAT_ID2 }}
         run: python main.py
+        
+- name: Commit prices
+  run: |
+    git config --global user.name "github-actions"
+    git config --global user.email "github-actions@github.com"
+    git add prices.json
+    git diff --cached --quiet || git commit -m "Update prices"
+    git push
