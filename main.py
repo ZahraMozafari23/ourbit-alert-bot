@@ -134,7 +134,7 @@ def check_coins():
 
                     print(symbol, f"{change:.2f}%")
 
-                    if change <= DROP_PERCENT
+                    if change <= DROP_PERCENT:
 
                         if symbol not in alerted_coins:
 
