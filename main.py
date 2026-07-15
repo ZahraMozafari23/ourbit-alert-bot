@@ -99,11 +99,12 @@ def check_coins():
 
         except Exception as e:
             print("Coin Error:", e)
-         
-print("Saved coins:", len(new_prices))
+            print("Saved coins:", len(new_prices))
 print(list(new_prices.items())[:5])
 
 save_prices(new_prices)
+
+         
 
 
 
