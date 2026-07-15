@@ -1,28 +1,39 @@
 import os
 import json
+import time
 import requests
-from datetime import datetime
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
+
+# درصد ریزش موردنظر
 DROP_PERCENT = -50
 
+# هر 5 دقیقه اجرا می‌شود
+CHECK_INTERVAL = 300
+
+# نگهداری 12 رکورد = حدود 1 ساعت
+MAX_HISTORY = 12
+
+# جلوگیری از هشدار تکراری
 alerted_coins = set()
 
 
 def send_message(text):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
-    data = {
-    "chat_id": CHAT_ID,
-    "text": text
-}
     try:
-        r = requests.post(url, data=data, timeout=15)
-        print("Telegram:", r.status_code)
-        print(r.text)
+        requests.post(
+            url,
+            data={
+                "chat_id": CHAT_ID,
+                "text": text
+            },
+            timeout=15
+        )
     except Exception as e:
         print("Telegram Error:", e)
+
 
 def load_prices():
     try:
@@ -32,14 +43,17 @@ def load_prices():
         return {}
 
 
-def save_prices(prices):
+def save_prices(data):
     with open("prices.json", "w") as f:
-        json.dump(prices, f)
+        json.dump(data, f, indent=2)
+
+
 def get_market():
+
     url = "https://www.ourbit.com/api/platform/spot/market/v2/tickers"
 
     try:
-        response = requests.get(url, timeout=15)
+        response = requests.get(url, timeout=20)
 
         print("API Status:", response.status_code)
 
@@ -54,7 +68,22 @@ def get_market():
         return None
 
 
+def update_history(history, symbol, price):
+
+    if symbol not in history:
+        history[symbol] = []
+
+    history[symbol].append({
+        "time": int(time.time()),
+        "price": price
+    })
+
+    if len(history[symbol]) > MAX_HISTORY:
+        history[symbol] = history[symbol][-MAX_HISTORY:]
+        
 def check_coins():
+
+    history = load_prices()
 
     data = get_market()
 
@@ -62,8 +91,6 @@ def check_coins():
         return
 
     coins = data["data"]
-    old_prices = load_prices()
-    new_prices = {}
 
     print("Coins:", len(coins))
 
@@ -72,47 +99,58 @@ def check_coins():
         try:
 
             symbol = coin["sb"]
-            price = float(coin["c"])
-            new_prices[symbol] = price
 
+            # حذف بازارهای غیرعادی
             if symbol.startswith("~~"):
                 continue
 
-            change = float(coin["r8"]) * 100
+            price = float(coin["c"])
 
-            print(symbol, change)
+            # اگر قبلاً سابقه داشته باشد
+            if symbol in history and len(history[symbol]) >= MAX_HISTORY:
 
-            if change <=DROP_PERCENT:
+                old_price = history[symbol][0]["price"]
 
-                if symbol in alerted_coins:
-                    continue
+                if old_price > 0:
 
-                alerted_coins.add(symbol)
+                    change = ((price - old_price) / old_price) * 100
 
-                message = (
-                    "🚨 ریزش شدید در Ourbit\n\n"
-                    f"🪙 {symbol}\n"
-                    f"📉 {change:.2f}%"
-                )
+                    print(symbol, f"{change:.2f}%")
 
-                send_message(message)
+                    if change <= DROP_PERCENT:
+
+                        if symbol not in alerted_coins:
+
+                            alerted_coins.add(symbol)
+
+                            message = (
+                                "🚨 هشدار ریزش شدید\n\n"
+                                f"🪙 {symbol}\n"
+                                f"📉 افت: {change:.2f}%\n\n"
+                                f"💵 یک ساعت قبل: {old_price}\n"
+                                f"💵 الان: {price}"
+                            )
+
+                            send_message(message)
+
+                    else:
+                        # اگر دوباره عادی شد اجازه هشدار بعدی بده
+                        if symbol in alerted_coins:
+                            alerted_coins.remove(symbol)
+
+            # ذخیره قیمت جدید
+            update_history(history, symbol, price)
 
         except Exception as e:
-            print("Coin Error:", e)
+            print("Coin Error:", symbol, e)
 
-    print("Saved coins:", len(new_prices))
-    print(list(new_prices.items())[:5])
+    save_prices(history)
 
-    save_prices(new_prices)
-         
-
+    print("History Saved")
 
 
 print("Bot Started")
 
-
-data=get_market()
-print(data)
 check_coins()
 
 print("Finished")
