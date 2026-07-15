@@ -99,7 +99,8 @@ def check_coins():
 
         except Exception as e:
             print("Coin Error:", e)
-save_prices(new_prices)  
+            seve_prices(new_prices)
+
 
 
 print("Bot Started")
