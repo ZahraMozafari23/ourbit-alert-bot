@@ -138,6 +138,8 @@ def check_coins():
         try:
 
             symbol = coin["sb"]
+            if symbol.starswith("~~"):
+                continue
 
             # همه ارزها بررسی شوند
             price = float(coin["c"])
