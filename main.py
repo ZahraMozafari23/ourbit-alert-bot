@@ -32,9 +32,7 @@ def send_message(text):
             timeout=15
         )
 
-        print("Telegram Status:", response.status_code)
-        print(response.text)
-
+        
     except Exception as e:
         print("Telegram Error:", e)
 
@@ -110,8 +108,7 @@ def check_coins():
 
             price = float(coin["c"])
 
-            print("Test",symbol)
-            send_massage(f"تست:{symbol}قیمت{price}")
+            
 
             # اگر قبلاً سابقه داشته باشد
             if symbol in history and len(history[symbol]) >= MAX_HISTORY:
