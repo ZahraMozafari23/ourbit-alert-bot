@@ -8,7 +8,7 @@ CHAT_ID = os.getenv("CHAT_ID")
 CHAT_ID_2 = os.getenv("CHAT_ID_2")
 
 # درصد ریزش موردنظر
-DROP_PERCENT = 5
+DROP_PERCENT = 20
 
 # فاصله زمانی هدف (یک ساعت)
 TARGET_TIME = 3600
@@ -21,6 +21,7 @@ def send_message(text):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
     for chat_id in [CHAT_ID, CHAT_ID_2]:
+        print("sending to:" , chat_id)
 
         if not chat_id:
             continue
