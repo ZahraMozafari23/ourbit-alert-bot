@@ -27,7 +27,7 @@ jobs:
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
-          CHAT_ID2: ${{ secrets.CHAT_ID2 }}
+          CHAT_ID2: ${{ secrets.CHAT_ID_2 }}
         run: python main.py
 
       - name: Commit prices
