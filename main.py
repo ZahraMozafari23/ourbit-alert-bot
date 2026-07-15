@@ -12,11 +12,10 @@ alerted_coins = set()
 def send_message(text):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
-    data = {
-        "chat_id": CHAT_ID,CHAT_ID2
-        "text": text
-    }
-
+    chat_ids=[CHAT_ID,CHAT_ID2]
+    for chat_id in chat_ids:
+        if not chat_id:
+            continue
     try:
         r = requests.post(url, data=data, timeout=15)
         print("Telegram:", r.status_code)
