@@ -5,6 +5,7 @@ import requests
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
+CHAT_ID_2 = os.getenv("CHAT_ID_2")
 
 # درصد ریزش موردنظر
 DROP_PERCENT = -50
@@ -19,20 +20,23 @@ MAX_HISTORY = 20
 def send_message(text):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
-    try:
-        response = requests.post(
-            url,
-            data={
-                "chat_id": CHAT_ID,
-                "text": text
-            },
-            timeout=15
-        )
+    for chat_id in [CHAT_ID, CHAT_ID_2]:
 
-        print("Telegram:", response.status_code)
+        if not chat_id:
+            continue
 
-    except Exception as e:
-        print("Telegram Error:", e)
+        try:
+            requests.post(
+                url,
+                data={
+                    "chat_id": chat_id,
+                    "text": text
+                },
+                timeout=15
+            )
+
+        except Exception as e:
+            print("Telegram Error:", e)
 
 
 def load_prices():
