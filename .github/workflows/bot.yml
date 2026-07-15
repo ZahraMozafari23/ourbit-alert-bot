@@ -24,4 +24,5 @@ jobs:
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
+          CHAT_ID2: ${{ secrets.CHAT_ID2 }}
         run: python main.py
