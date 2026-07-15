@@ -87,7 +87,7 @@ def check_coins():
 
 print("Bot Started")
 
-send_message("✅ ربات Ourbit روی GitHub اجرا شد.")
+
 data=get_market()
 print(data)
 check_coins()
