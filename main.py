@@ -7,15 +7,14 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
 # درصد ریزش موردنظر
-DROP_PERCENT = 1
+DROP_PERCENT = -50
 
-# هر 5 دقیقه اجرا می‌شود
+# هر 5 دقیقه
 CHECK_INTERVAL = 300
 
-# نگهداری 12 رکورد = حدود 1 ساعت
+# نگهداری تاریخچه یک ساعت
 MAX_HISTORY = 12
 
-# جلوگیری از هشدار تکراری
 alerted_coins = set()
 
 
@@ -32,7 +31,8 @@ def send_message(text):
             timeout=15
         )
 
-        
+        print("Telegram:", response.status_code, response.text)
+
     except Exception as e:
         print("Telegram Error:", e)
 
@@ -82,7 +82,6 @@ def update_history(history, symbol, price):
 
     if len(history[symbol]) > MAX_HISTORY:
         history[symbol] = history[symbol][-MAX_HISTORY:]
-        
 def check_coins():
 
     history = load_prices()
@@ -95,7 +94,7 @@ def check_coins():
     coins = data["data"]
 
     print("Coins:", len(coins))
-   
+
 
     for coin in coins:
 
@@ -109,31 +108,30 @@ def check_coins():
 
             price = float(coin["c"])
 
-            
 
             # اگر قبلاً سابقه داشته باشد
-            if symbol in history and len(history[symbol]) >= MAX_HISTORY:
-                print("History check:", symbol, len(history[symbol]))
+            if symbol in history and len(history[symbol]) >= 12:
 
                 current_time = int(time.time())
 
                 old_record = None
 
+                # پیدا کردن قیمت حدود یک ساعت قبل
                 for item in history[symbol]:
+
                     if current_time - item["time"] >= 3600:
-                       old_record = item
-                       break
+                        old_record = item
+                        break
+
+
                 if old_record:
+
                     old_price = old_record["price"]
-                else:
-                     old_price = history[symbol][0]["price"]
-  
-                
-                if old_price > 0:
 
                     change = ((price - old_price) / old_price) * 100
 
                     print(symbol, f"{change:.2f}%")
+
 
                     if change <= DROP_PERCENT:
 
@@ -152,24 +150,29 @@ def check_coins():
                             send_message(message)
 
                     else:
-                        # اگر دوباره عادی شد اجازه هشدار بعدی بده
+
                         if symbol in alerted_coins:
                             alerted_coins.remove(symbol)
+
+
 
             # ذخیره قیمت جدید
             update_history(history, symbol, price)
 
+
         except Exception as e:
+
             print("Coin Error:", symbol, e)
+
 
     save_prices(history)
 
     print("History Saved")
 
 
+
 print("Bot Started")
 
 check_coins()
-
 
 print("Finished")
