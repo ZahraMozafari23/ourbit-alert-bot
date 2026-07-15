@@ -1,5 +1,7 @@
 import os
+import json
 import requests
+from datetime import datetime
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
@@ -22,7 +24,17 @@ def send_message(text):
     except Exception as e:
         print("Telegram Error:", e)
 
+def load_prices():
+    try:
+        with open("prices.json", "r") as f:
+            return json.load(f)
+    except:
+        return {}
 
+
+def save_prices(prices):
+    with open("prices.json", "w") as f:
+        json.dump(prices, f)
 def get_market():
     url = "https://www.ourbit.com/api/platform/spot/market/v2/tickers"
 
