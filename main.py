@@ -138,7 +138,7 @@ def check_coins():
         try:
 
             symbol = coin["sb"]
-            if symbol.starswith("~~"):
+            if symbol.startswith("~~"):
                 continue
 
             # همه ارزها بررسی شوند
