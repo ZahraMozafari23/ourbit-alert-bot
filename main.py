@@ -3,7 +3,6 @@ import requests
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
-CHAT_ID2 = os.getenv("CHAT_ID2")
 DROP_PERCENT = -50
 
 alerted_coins = set()
@@ -12,10 +11,9 @@ alerted_coins = set()
 def send_message(text):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
-    chat_ids=[CHAT_ID,CHAT_ID2]
-    for chat_id in chat_ids:
-        if not chat_id:
-            continue
+    data={"chat_id:CHAT_ID,
+          "text":text
+         }
     try:
         r = requests.post(url, data=data, timeout=15)
         print("Telegram:", r.status_code)
