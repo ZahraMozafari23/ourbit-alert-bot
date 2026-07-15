@@ -9,13 +9,11 @@ CHAT_ID = os.getenv("CHAT_ID")
 # درصد ریزش موردنظر
 DROP_PERCENT = -50
 
-# هر 5 دقیقه
-CHECK_INTERVAL = 300
+# فاصله زمانی هدف (یک ساعت)
+TARGET_TIME = 3600
 
-# نگهداری تاریخچه یک ساعت
-MAX_HISTORY = 12
-
-alerted_coins = set()
+# نگهداری حداکثر تاریخچه
+MAX_HISTORY = 20
 
 
 def send_message(text):
@@ -31,7 +29,7 @@ def send_message(text):
             timeout=15
         )
 
-        print("Telegram:", response.status_code, response.text)
+        print("Telegram:", response.status_code)
 
     except Exception as e:
         print("Telegram Error:", e)
@@ -41,6 +39,7 @@ def load_prices():
     try:
         with open("prices.json", "r") as f:
             return json.load(f)
+
     except:
         return {}
 
@@ -55,7 +54,11 @@ def get_market():
     url = "https://www.ourbit.com/api/platform/spot/market/v2/tickers"
 
     try:
-        response = requests.get(url, timeout=20)
+
+        response = requests.get(
+            url,
+            timeout=20
+        )
 
         print("API Status:", response.status_code)
 
@@ -66,22 +69,51 @@ def get_market():
         return response.json()
 
     except Exception as e:
+
         print("API Error:", e)
         return None
 
 
-def update_history(history, symbol, price):
+def add_price(history, symbol, price):
 
     if symbol not in history:
         history[symbol] = []
 
-    history[symbol].append({
-        "time": int(time.time()),
-        "price": price
-    })
+    history[symbol].append(
+        {
+            "time": int(time.time()),
+            "price": price
+        }
+    )
 
+    # فقط تاریخچه اخیر نگه داشته شود
     if len(history[symbol]) > MAX_HISTORY:
         history[symbol] = history[symbol][-MAX_HISTORY:]
+def find_old_price(records):
+
+    now = int(time.time())
+
+    old_record = None
+    smallest_difference = None
+
+    for item in records:
+
+        diff = now - item["time"]
+
+        # نزدیک‌ترین رکورد به یک ساعت قبل
+        if diff >= TARGET_TIME:
+
+            if smallest_difference is None or diff < smallest_difference:
+                smallest_difference = diff
+                old_record = item
+
+    if old_record:
+        return old_record["price"]
+
+    return None
+
+
+
 def check_coins():
 
     history = load_prices()
@@ -102,42 +134,25 @@ def check_coins():
 
             symbol = coin["sb"]
 
-            # حذف بازارهای غیرعادی
-            if symbol.startswith("~~"):
-                continue
-
+            # همه ارزها بررسی شوند
             price = float(coin["c"])
 
 
-            # اگر قبلاً سابقه داشته باشد
-            if symbol in history and len(history[symbol]) >= 12:
+            # اگر برای این ارز تاریخچه داریم
+            if symbol in history:
 
-                current_time = int(time.time())
-
-                old_record = None
-
-                # پیدا کردن قیمت حدود یک ساعت قبل
-                for item in history[symbol]:
-
-                    if current_time - item["time"] >= 3600:
-                        old_record = item
-                        break
+                old_price = find_old_price(history[symbol])
 
 
-                if old_record:
+                if old_price:
 
-                    old_price = old_record["price"]
+                    if old_price > 0:
 
-                    change = ((price - old_price) / old_price) * 100
+                        change = ((price - old_price) / old_price) * 100
 
-                    print(symbol, f"{change:.2f}%")
+                        print(symbol, f"{change:.2f}%")
 
-
-                    if change <= DROP_PERCENT:
-
-                        if symbol not in alerted_coins:
-
-                            alerted_coins.add(symbol)
+                        if change <= DROP_PERCENT:
 
                             message = (
                                 "🚨 هشدار ریزش شدید\n\n"
@@ -149,20 +164,20 @@ def check_coins():
 
                             send_message(message)
 
-                    else:
-
-                        if symbol in alerted_coins:
-                            alerted_coins.remove(symbol)
-
 
 
             # ذخیره قیمت جدید
-            update_history(history, symbol, price)
+            add_price(
+                history,
+                symbol,
+                price
+            )
 
 
         except Exception as e:
 
-            print("Coin Error:", symbol, e)
+            print("Coin Error:", e)
+
 
 
     save_prices(history)
