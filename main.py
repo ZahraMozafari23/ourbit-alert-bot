@@ -129,7 +129,7 @@ def check_coins():
 
                     print(symbol, f"{change:.2f}%")
 
-                    if True
+                    if True:
 
                         if symbol not in alerted_coins:
 
