@@ -109,8 +109,20 @@ def check_coins():
             # اگر قبلاً سابقه داشته باشد
             if symbol in history and len(history[symbol]) >= MAX_HISTORY:
 
-                old_price = history[symbol][0]["price"]
+                current_time = int(time.time())
 
+                old_record = None
+
+                for item in history[symbol]:
+                    if current_time - item["time"] >= 3600:
+                       old_record = item
+                       break
+                if old_record:
+                    old_price = old_record["price"]
+                else:
+                     old_price = history[symbol][0]["price"]
+  
+                
                 if old_price > 0:
 
                     change = ((price - old_price) / old_price) * 100
