@@ -7,7 +7,7 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
 # درصد ریزش موردنظر
-DROP_PERCENT = -50
+DROP_PERCENT = -1
 
 # هر 5 دقیقه اجرا می‌شود
 CHECK_INTERVAL = 300
