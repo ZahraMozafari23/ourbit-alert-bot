@@ -33,6 +33,7 @@ def send_message(text):
         )
             print("Telegram Status:", response.status_code)
             print(response.text)
+        
     except Exception as e:
         print("Telegram Error:", e)
 
