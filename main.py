@@ -8,7 +8,7 @@ CHAT_ID = os.getenv("CHAT_ID")
 CHAT_ID_2 = os.getenv("CHAT_ID_2")
 
 # درصد ریزش موردنظر
-DROP_PERCENT = 20
+DROP_PERCENT = 35
 
 # فاصله زمانی هدف (یک ساعت)
 TARGET_TIME = 3600
