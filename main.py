@@ -113,6 +113,7 @@ def check_coins():
 
             # اگر قبلاً سابقه داشته باشد
             if symbol in history and len(history[symbol]) >= MAX_HISTORY:
+                print("History check:", symbol, len(history[symbol]))
 
                 current_time = int(time.time())
 
